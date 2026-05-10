@@ -1,7 +1,7 @@
 {
-  "name": "sakuchat-riya",
-  "version": "1.0.0",
-  "description": "Riya - Saku's Bengali Anime Bestie 💕",
+  "name": "riya-bestie",
+  "version": "2.0.0",
+  "description": "Riya - Smart Bengali GF Chatbot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -9,6 +9,7 @@
   "dependencies": {
     "express": "^4.18.2",
     "socket.io": "^4.7.2",
-    "groq-sdk": "^0.5.0"
+    "groq-sdk": "^0.5.0",
+    "axios": "^1.6.0"
   }
 }
