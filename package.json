@@ -1,0 +1,14 @@
+{
+  "name": "sakuchat-riya",
+  "version": "1.0.0",
+  "description": "Riya - Saku's Bengali Anime Bestie 💕",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "groq-sdk": "^0.5.0"
+  }
+}
