@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: #0b141a; color: #e9edef; }
+   .header { background: #202c33; padding: 10px 16px; display: flex; align-items: center; position: fixed; top: 0; width: 100%; z-index: 100; }
+   .header img { width: 40px; height: 40px; border-radius: 50%; margin-right: 15px; }
+   .header-info { flex: 1; }
+   .header-name { font-size: 16px; font-weight: 500; }
+   .header-status { font-size: 13px; color: #8696a0; }
+   .header-icon { font-size: 22px; margin-left: 20px; cursor: pointer; }
+    #messages { padding: 70px 10px 70px; height: 100vh; overflow-y: auto; background-image: url('https://i.imgur.com/8QfDRXv.png'); background-color: #0b141a; }
+   .msg-wrap { position: relative; margin: 2px 0; }
+   .msg { max-width: 75%; padding: 6px 7px 8px 9px; border-radius: 7.5px; word-wrap: break-word; font-size: 14.2px; line-height: 19px; position: relative; }
+   .user { background: #005c4b; margin-left: auto; border-top-right-radius: 0; }
+   .bot { background: #202c33; margin-right: auto; border-top-left-radius: 0; }
+   .msg-wrap:has(.image-msg),.msg-wrap:has(.sticker) { background: transparent!important; }
+   .msg-wrap:has(.image-msg).msg,.msg-wrap:has(.sticker).msg { background: transparent!important; padding: 0!important; }
+   .image-msg { max-width: 240px; max-height: 300px; border-radius: 12px; margin: 2px 0; cursor: pointer; }
+   .sticker { max-width: 180px; max-height: 180px; border-radius: 0px; margin: 2px 0; background: transparent; object-fit: contain; }
+   .sticker-pack-title { font-size: 11px; color: #8696a0; margin-top: 4px; text-align: right; }
+   .input-area { position: fixed; bottom: 0; width: 100%; background: #202c33; padding: 5px 10px; display: flex; align-items: center; gap: 5px; }
+   .input-box { flex: 1; background: #2a3942; border: none; border-radius: 20px; padding: 9px 12px; color: #e9edef; font-size: 15px; outline: none; }
+   .send-btn { background: #00a884; border: none; width: 45px; height: 45px; border-radius: 50%; color: white; font-size: 20px; cursor: pointer; }
+   .sticker-btn { background: none; border: none; font-size: 24px; cursor: pointer; margin-right: 5px; }
+   .react-bar { display: none; position: absolute; bottom: -35px; right: 10px; background: #202c33; padding: 5px 8px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 10; gap: 8px; }
+   .msg:hover +.react-bar,.react-bar:hover { display: flex; }
+   .react-bar span { font-size: 18px; cursor: pointer; transition: 0.2s; }
+   .react-bar span:active { transform: scale(1.4); }
+   .reaction { position: absolute; bottom: -8px; right: 8px; background: #202c33; border: 2px solid #0b141a; border-radius: 10px; padding: 1px 5px; font-size: 12px; }
+   .sticker-picker { display: none; position: absolute; bottom: 60px; left: 10px; background: #202c33; padding: 10px; border-radius: 10px; width: 320px; height: 250px; overflow-y: auto; }
+   .sticker-picker h4 { color: #8696a0; font-size: 13px; margin: 5px 0; }
+   .sticker-picker img { width: 70px; height: 70px; margin: 4px; cursor: pointer; border-radius: 8px; object-fit: contain; }
+   .sticker-picker img:active { transform: scale(0.9); }
+    #call-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; color: white; text-align: center; padding-top: 40%; }
+    #call-screen img { width: 120px; height: 120px; border-radius: 50%; margin-bottom: 20px; }
+   .call-btn { border: none; width: 70px; height: 70px; border-radius: 50%; font-size: 30px; margin: 0 20px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="https://i.imgur.com/3QZ2Q3L.png" alt="Riya" id="dp">
+    <div class="header-info">
+      <div class="header-name">Riya 💕</div>
+      <div class="header-status" id="status">online</div>
+    </div>
+    <div class="header-icon" onclick="fakeCall()">📞</div>
+  </div>
+
+  <div id="messages"></div>
+
+  <div class="input-area">
+    <button class="sticker-btn" onclick="toggleSticker()">😊</button>
+    <div class="sticker-picker" id="stickerPicker">
+      <h4>Kucing Gemoy 🐱</h4>
+      <img src="https://i.imgur.com/CzXTtJV.png" onclick="sendSticker(this.src, 'Kucing Gemoy')">
+      <h4>AOT Pack 🗡️</h4>
+      <img src="https://i.imgur.com/7QZ2Q3L.png" onclick="sendSticker(this.src, 'Attack on Titan')">
+      <h4>Anya Pack 🥜</h4>
+      <img src="https://media.tenor.com/3R7cXRmG5V4AAAAC/anya-spy-x-family.gif" onclick="sendSticker(this.src, 'Spy x Family')">
+      <h4>Ara Ara 😏</h4>
+      <img src="https://media.tenor.com/0pXoG_DzX5AAAAAC/ara-ara-anime.gif" onclick="sendSticker(this.src, 'Ara Ara')">
+    </div>
+    <input type="text" class="input-box" id="msgInput" placeholder="Message">
+    <button class="send-btn" onclick="sendMsg()">➤</button>
+  </div>
+
+  <div id="call-screen">
+    <img src="https://i.imgur.com/3QZ2Q3L.png" id="call-dp">
+    <h2>Riya 💕</h2>
+    <p style="opacity:0.8; margin:10px 0;">Incoming voice call...</p>
+    <div style="margin-top:60px;">
+      <button class="call-btn" style="background:#f44336;" onclick="endCall()">📞</button>
+      <button class="call-btn" style="background:#4CAF50;" onclick="acceptCall()">📞</button>
+    </div>
+    <audio id="ringtone" loop>
+      <source src="https://www.soundjay.com/phone/sounds/telephone-ring-03a.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const messages = document.getElementById('messages');
+    const msgInput = document.getElementById('msgInput');
+
+    function toggleSticker() {
+      const picker = document.getElementById('stickerPicker');
+      picker.style.display = picker.style.display === 'block'? 'none' : 'block';
+    }
+
+    function sendSticker(url, packName) {
+      const msgWrap = document.createElement('div');
+      msgWrap.className = 'msg-wrap';
+      msgWrap.style.textAlign = 'right';
+      msgWrap.innerHTML = `<img src="${url}" class="sticker"><div class="sticker-pack-title">${packName} • Sticker.ly</div>`;
+      messages.appendChild(msgWrap);
+      messages.scrollTop = messages.scrollHeight;
+      socket.emit('user message', 'sticker_sent: ' + url + '|' + packName);
+      document.getElementById('stickerPicker').style.display = 'none';
+    }
+
+    function addMsg(text, sender) {
+      const msgWrap = document.createElement('div');
+      msgWrap.className = 'msg-wrap';
+
+      if(text.includes('dp_change:')) {
+        const newDP = text.split('dp_change:')[1].split('\n')[0].trim();
+        document.getElementById('dp').src = newDP;
+        document.getElementById('call-dp').src = newDP;
+        text = text.split('\n').slice(1).join('\n');
+      }
+
+      if(text.includes('<img')) {
+        msgWrap.innerHTML = text;
+        msgWrap.style.textAlign = sender === 'user'? 'right' : 'left';
+        if(text.includes('class="image-msg"')) {
+          msgWrap.querySelector('img').onclick = () => window.open(text.match(/src="([^"]+)"/)[1], '_blank');
+        }
+      } else {
+        const msg = document.createElement('div');
+        msg.className = 'msg ' + sender;
+        msg.innerHTML = text;
+        if(sender === 'bot') {
+          const reactBar = document.createElement('div');
+          reactBar.className = 'react-bar';
+          reactBar.innerHTML = `<span onclick="addReaction(this, '❤️')">❤️</span><span onclick="addReaction(this, '😂')">😂</span><span onclick="addReaction(this, '😭')">😭</span><span onclick="addReaction(this, '😮')">😮</span><span onclick="addReaction(this, '👍')">👍</span>`;
+          msgWrap.appendChild(reactBar);
+        }
+        msgWrap.appendChild(msg);
+      }
+
+      messages.appendChild(msgWrap);
+      messages.scrollTop = messages.scrollHeight;
+      if(sender === 'bot') {
+        document.getElementById('status').innerText = 'online';
+        setTimeout(() => document.getElementById('status').innerText = 'last seen today at ' + new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'}), 2000);
+      }
+    }
+
+    function sendMsg() {
+      const text = msgInput.value.trim();
+      if(!text) return;
+      if(text.match(/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i)) {
+        addMsg(`<img src="${text}" class="image-msg">`, 'user');
+        socket.emit('user message', 'send_image: ' + text);
+      }
+      else if(text.toLowerCase().includes('pfp match') || text.toLowerCase().includes('dp match')) {
+        const urlMatch = text.match(/(https?:\/\/[^\s]+)/);
+        if(urlMatch) {
+          addMsg(`<img src="${urlMatch[0]}" class="image-msg">`, 'user');
+          socket.emit('user message', 'dp_change_request: ' + urlMatch[0]);
+        }
+      }
+      else {
+        addMsg(text, 'user');
+        socket.emit('user message', text);
+      }
+      msgInput.value = '';
+      document.getElementById('status').innerText = 'typing...';
+    }
+
+    function addReaction(el, emoji) {
+      const msg = el.closest('.msg-wrap').querySelector('.msg');
+      let reaction = msg.querySelector('.reaction');
+      if(!reaction) {
+        reaction = document.createElement('div');
+        reaction.className = 'reaction';
+        msg.appendChild(reaction);
+      }
+      reaction.innerText = emoji;
+      socket.emit('user reacted', emoji);
+    }
+
+    function fakeCall() { socket.emit('user message', 'call kor'); }
+    function endCall() {
+      document.getElementById('call-screen').style.display = 'none';
+      document.getElementById('ringtone').pause();
+      addMsg('তুই call কাটলি কেন সোনা? 😭💕 Missed call...', 'bot');
+    }
+    function acceptCall() {
+      document.getElementById('call-screen').style.display = 'none';
+      document.getElementById('ringtone').pause();
+      addMsg('Hello sona 😭💕 আমার গলা শুনতে পাচ্ছিস? আমি তোকে কল করলাম... 💕✨', 'bot');
+    }
+
+    socket.on('bot reply', (text) => addMsg(text, 'bot'));
+    socket.on('bot reaction', (data) => {
+      const userMsgs = document.querySelectorAll('.msg.user');
+      const lastUserMsg = userMsgs[userMsgs.length - 1];
+      if(lastUserMsg) {
+        let reaction = lastUserMsg.querySelector('.reaction');
+        if(!reaction) {
+          reaction = document.createElement('div');
+          reaction.className = 'reaction';
+          lastUserMsg.appendChild(reaction);
+        }
+        reaction.innerText = data.emoji;
+      }
+    });
+    socket.on('incoming call', () => {
+      document.getElementById('call-screen').style.display = 'block';
+      document.getElementById('ringtone').play();
+      if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 500]);
+    });
+
+    msgInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMsg(); });
+    setTimeout(() => addMsg('Sonaaa 😭💕 Ami Riya... Finally tor phone e chole elam 💕✨', 'bot'), 1000);
+  </script>
+</body>
+</html>
