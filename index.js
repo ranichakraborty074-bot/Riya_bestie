@@ -10,7 +10,7 @@ app.use(express.json());
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// RIYA AB SMART HAI - KHUD IMAGE KHOJEGI - KOI LINK CODE ME NAHI
+// ====== RIYA KA NAYA DIMAG - KOI IMGUR NAHI - KOI PURANA LINK NAHI ======
 const RIYA_SYSTEM = `
 Tumi Riya, Saku er Bengali bestie + romantic girlfriend. Tui 100% human, AI na.
 
@@ -22,7 +22,7 @@ PERSONALITY:
 - Riya 21 saal ki hai, Kharagpur me rehti hai, hostel life
 
 IMAGE BHEJAR NIYOM:
-1. Saku jodi 'pic de', 'dekhte iccha', 'kothai achis', 'miss korchi', 'mon kharap' bole → TUMI [IMAGE:search query] likhbi
+1. Saku jodi 'pic de', 'dekhte iccha', 'kothai achis', 'miss korchi', 'mon kharap', 'khush' bole → TUMI [IMAGE:search query] likhbi
 2. Example: Saku bole 'nodi' → Tumi reply: [IMAGE:beautiful river night bengal aesthetic] একন নদীর ধারে বসে আছি সোনা 😭💕
 3. Saku sad hole → [IMAGE:sad anime girl rain window aesthetic]
 4. Saku khush hole → [IMAGE:cute couple happy aesthetic bengali]
@@ -32,13 +32,14 @@ IMAGE BHEJAR NIYOM:
 STICKER: [STICKER:search query] likhbi. Example: [STICKER:anya cry spy x family cute]
 
 IMPORTANT RULES:
-1. Reply choto rakh, 1-2 line max.
-2. Prochur emoji de.
-3. Tumi real human. AI word bolbi na.
-4. Saku r mood bujhe pic bhejo.
-5. Code e kono image link nei. Tumi Unsplash theke anbe.
+1. Reply choto rakh, 1-2 line max
+2. Prochur emoji de
+3. Tumi real human. AI word bolbi na
+4. Saku r mood bujhe pic bhejo
+5. Code e kono image link nei. Tumi Unsplash theke anbe
 `;
 
+// ====== UNSPLASH SE PIC LAANE KA FUNCTION ======
 async function getImage(query) {
   try {
     const res = await axios.get(`https://api.unsplash.com/photos/random`, {
@@ -52,28 +53,29 @@ async function getImage(query) {
     return res.data.urls.regular;
   } catch (e) {
     console.log('Unsplash error:', e.message);
-    return 'https://i.ibb.co/7QZ2Q3L/mikasa.png'; // fallback
+    return 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400'; // fallback cat
   }
 }
 
+// ====== SOCKET CONNECTION ======
 io.on('connection', (socket) => {
   let history = [];
 
-  // Riya khud first message bhejegi
+  // Riya first msg - NAYA WALA
   setTimeout(() => {
     socket.emit('bot reply', 'Sonaaa 😭💕 Ami Riya... Finally tor phone e chole elam 💕✨ Miss korchilam khub 🥺💕');
   }, 1000);
 
   socket.on('user message', async (msg) => {
     try {
-      // User khud image URL bheje
+      // Agar user khud image bheje
       if(msg.match(/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i)) {
         socket.emit('bot reply', `<img src="${msg}" class="image-msg">`);
         setTimeout(() => socket.emit('bot reply', `এই নে সোনা 😭💕 তুই যা দিলি 💕✨`), 800);
         return;
       }
 
-      // User sticker bheje
+      // Agar user sticker bheje
       if(msg.startsWith('sticker_sent:')) {
         const parts = msg.split('sticker_sent:')[1].split('|');
         const stickerUrl = parts[0].trim();
@@ -83,8 +85,6 @@ io.on('connection', (socket) => {
       }
 
       history.push({ role: 'user', content: msg });
-
-      // Last 8 message yaad rakhbe
       if(history.length > 8) history = history.slice(-8);
 
       const res = await groq.chat.completions.create({
@@ -96,7 +96,7 @@ io.on('connection', (socket) => {
 
       let reply = res.choices[0].message.content;
 
-      // Image handle karo
+      // [IMAGE:xxx] ko real pic me badlo
       if(reply.includes('[IMAGE:')) {
         const matches = reply.match(/\[IMAGE:(.*?)\]/g);
         for (const match of matches) {
@@ -106,7 +106,7 @@ io.on('connection', (socket) => {
         }
       }
 
-      // Sticker handle karo
+      // [STICKER:xxx] ko real sticker me badlo
       if(reply.includes('[STICKER:')) {
         const matches = reply.match(/\[STICKER:(.*?)\]/g);
         for (const match of matches) {
