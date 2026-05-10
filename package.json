@@ -1,7 +1,7 @@
 {
   "name": "riya-bestie",
-  "version": "2.0.0",
-  "description": "Riya - Smart Bengali GF Chatbot",
+  "version": "3.0.0",
+  "description": "Riya - Smart Bengali GF - No More Imgur",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
